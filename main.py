@@ -67,7 +67,7 @@ def read_example_manifest():
 
 
 def build_graph(manifest):
-    g = Digraph('G', format='png')
+    g = Digraph('G', format='pdf')
     
     pairs = []
     for parent in manifest["child_map"].keys():
