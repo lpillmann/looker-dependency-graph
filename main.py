@@ -12,7 +12,7 @@ class Node(UserDict):
 
 
 def read_lookml(filepath):
-    with open(filepath) as f: 
+    with open(filepath) as f:
         lookml = lkml.load(f.read())
     return lookml
 
@@ -25,13 +25,13 @@ def get_nodes(model):
     nodes[f"model.{model_name}"] = Node()
     for explore in lookml["explores"]:
         node = Node()
-        
+
         if "joins" in explore.keys():
             for view in explore["joins"]:
                 node["depends_on"].append(f"view.{view['name']}")
-        
+
         node["depends_on"].append(f"view.{explore['name']}")
-        
+
         explore_node_name = f"explore.{explore['name']}"
         nodes[explore_node_name] = node
         nodes[f"model.{model_name}"]["depends_on"].append(explore_node_name)
@@ -47,12 +47,12 @@ def build_child_map(nodes):
 
 
 def build_manifest():
-    p = Path('./input/models')
-    models = list(p.glob('**/*.model.lkml'))
+    p = Path("./input/models")
+    models = list(p.glob("**/*.model.lkml"))
     if not len(models) > 0:
         return None
     manifest = dict(nodes={}, child_map={})
-    for model in p.glob('**/*.model.lkml'):
+    for model in p.glob("**/*.model.lkml"):
         nodes = get_nodes(model)
         manifest["nodes"] = {**manifest["nodes"], **nodes}
         child_map = build_child_map(nodes)
@@ -67,8 +67,8 @@ def read_example_manifest():
 
 
 def build_graph(manifest):
-    g = Digraph('G', format='pdf')
-    
+    g = Digraph("G", format="pdf")
+
     pairs = []
     for parent in manifest["child_map"].keys():
         for child in manifest["child_map"][parent]:
@@ -76,20 +76,20 @@ def build_graph(manifest):
 
     for pair in pairs:
         g.edge(*pair)
-    
+
     return g
 
 
-def main(): 
+def main():
     manifest = build_manifest()
-    
+
     if manifest is None:
-        print('No LookML models found. Using example instead.')
+        print("No LookML models found. Using example instead.")
         manifest = read_example_manifest()
-    
+
     g = build_graph(manifest)
-    g.render('output/dependency_graph.gv', view=True)
-    
+    g.render("output/dependency_graph.gv", view=True)
+
 
 if __name__ == "__main__":
     main()
