@@ -2,8 +2,8 @@ import json
 from collections import UserDict
 from pathlib import Path
 
-from graphviz import Digraph
 import lkml
+from graphviz import Digraph
 
 
 class Node(UserDict):
@@ -49,14 +49,17 @@ def build_child_map(nodes):
 def build_manifest():
     p = Path("./input/models")
     models = list(p.glob("**/*.model.lkml"))
+    
     if not len(models) > 0:
         return None
+    
     manifest = dict(nodes={}, child_map={})
-    for model in p.glob("**/*.model.lkml"):
+    for model in models:
         nodes = get_nodes(model)
         manifest["nodes"] = {**manifest["nodes"], **nodes}
         child_map = build_child_map(nodes)
         manifest["child_map"] = {**manifest["child_map"], **child_map}
+    
     return manifest
 
 
