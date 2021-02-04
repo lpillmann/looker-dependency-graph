@@ -18,4 +18,4 @@ python main.py
 
 ## Example output
 
-![example graph][./output/example_dependency_graph.gv.png]
+![example graph](./output/example_dependency_graph.gv.png)
