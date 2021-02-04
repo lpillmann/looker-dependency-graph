@@ -1,0 +1,93 @@
+{
+    "nodes": {
+        "model.product": {
+            "raw_lookml":"",
+            "unique_id": "model.product",
+            "project_name": "analytics",
+            "root_path": "",
+            "path": "",
+            "name": "product",
+            "resource_type": "model",
+            "depends_on": {
+                "nodes": [
+                    "explore.user_events_cube"
+                ]
+            }
+        },
+        "explore.user_events_cube": {
+            "raw_lookml":"",
+            "unique_id": "explore.user_events_cube",
+            "project_name": "analytics",
+            "root_path": "",
+            "path": "",
+            "name": "user_events_cube",
+            "resource_type": "explore",
+            "depends_on": {
+                "nodes": [
+                    "view.user_events_cube",
+                    "view.dummy_view"
+                ]
+            }
+        },
+        "view.user_events_cube": {
+            "raw_lookml":"",
+            "unique_id": "view.user_events_cube",
+            "project_name": "analytics",
+            "root_path": "",
+            "path": "",
+            "name": "user_events_cube",
+            "resource_type": "view",
+            "depends_on": {
+                "nodes": [
+                    "table.bi.looker_user_events_cube"
+                ]
+            }
+        },
+        "table.bi.looker_user_events_cube": {
+            "raw_lookml":"",
+            "unique_id": "table.bi.looker_user_events_cube",
+            "project_name": "analytics",
+            "root_path": "",
+            "path": "",
+            "name": "looker_user_events_cube",
+            "resource_type": "table",
+            "depends_on": {
+                "nodes": []
+            }
+        }
+    },
+    "parent_map": {
+        "model.product": [],
+        "explore.user_events_cube": [
+            "model.product"
+        ],
+        "view.user_events_cube": [
+            "explore.user_events_cube"
+        ],
+        "table.bi.looker_user_events_cube": [
+            "view.user_events_cube"
+        ],
+        "view.dummy_view": [
+            "explore.user_events_cube"
+        ]
+    },
+    "child_map": {
+        "model.product": [
+            "explore.user_events_cube"
+        ],
+        "explore.user_events_cube": [
+            "view.user_events_cube",
+            "view.dummy_view"
+        ],
+        "view.user_events_cube": [
+            "table.bi.looker_user_events_cube"
+        ],
+        "table.bi.looker_user_events_cube": []
+    },
+    "metadata": {
+        "project_id": "",
+        "user_id": "",
+        "send_anonymous_usage_stats": true,
+        "adapter_type": "snowflake"
+    }
+}

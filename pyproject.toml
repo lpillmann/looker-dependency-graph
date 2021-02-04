@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "looker-dependency-graph"
+version = "0.1.0"
+description = ""
+authors = ["Lui Pillmann <lui.pillmann@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+graphviz = "^0.16"
+lkml = "^1.1.0"
+
+[tool.poetry.dev-dependencies]
+black = "^20.8b1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
