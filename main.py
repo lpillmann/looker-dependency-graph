@@ -1,13 +1,15 @@
 import json
 from collections import UserDict
 from pathlib import Path
-from typing import List
+from typing import Final, List
 
 import click
 from graphviz.backend import render
 import lkml
 from graphviz import Digraph
 
+
+INPUT_MODELS_PATH = "./input/models"
 
 class Node(UserDict):
     def __init__(self):
@@ -81,11 +83,11 @@ def build_manifest() -> dict:
     Build manifest containing nodes and child map objects.
     Expects LookML .model files to be in input/models folder.
     """
-    p = Path("./input/models")
+    p = Path(INPUT_MODELS_PATH)
     models = list(p.glob("**/*.model.lkml"))
 
-    if not len(models) > 0:
-        return None
+    if not models:
+        raise FileNotFoundError()
 
     manifest = dict(nodes=dict(), child_map=dict())
     for model in models:
@@ -133,11 +135,11 @@ def render_graph(g: Digraph, path: Path):
     help="Keep only edges connecting node passed. For multiple filters, pass a string with node names seperated by spaces",
 )
 def main(filters: str):
-    manifest = build_manifest()
-
-    if manifest is None:
-        print("No LookML models found. Using example instead.")
-        manifest = read_example_manifest()
+    try:
+        manifest = build_manifest()
+    except FileNotFoundError:
+        print(f"No LookML files found in {INPUT_MODELS_PATH}. Aborting.")
+        return 1
 
     parsed_filters = []
     if filters:
