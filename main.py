@@ -10,6 +10,8 @@ from graphviz import Digraph
 
 
 INPUT_MODELS_PATH = "./input/models"
+MODEL_FILE_EXTENSION = "*.model.lkml"
+
 
 class Node(UserDict):
     def __init__(self):
@@ -84,10 +86,12 @@ def build_manifest() -> dict:
     Expects LookML .model files to be in input/models folder.
     """
     p = Path(INPUT_MODELS_PATH)
-    models = list(p.glob("**/*.model.lkml"))
+    models = list(p.glob(f"**/{MODEL_FILE_EXTENSION}"))
 
     if not models:
-        raise FileNotFoundError()
+        raise FileNotFoundError(
+            f"No {MODEL_FILE_EXTENSION} files found in {INPUT_MODELS_PATH}"
+        )
 
     manifest = dict(nodes=dict(), child_map=dict())
     for model in models:
@@ -126,6 +130,7 @@ def build_graph(manifest: dict, filters: List = []) -> Digraph:
 
 
 def render_graph(g: Digraph, path: Path):
+    print(f"Rendering {path}")
     g.render(path, view=True)
 
 
@@ -137,14 +142,14 @@ def render_graph(g: Digraph, path: Path):
 def main(filters: str):
     try:
         manifest = build_manifest()
-    except FileNotFoundError:
-        print(f"No LookML files found in {INPUT_MODELS_PATH}. Aborting.")
-        return 1
+    except FileNotFoundError as e:
+        print(repr(e))
+        return
 
     parsed_filters = []
     if filters:
         parsed_filters = filters.split(" ")
-    
+
     g = build_graph(
         manifest,
         filters=parsed_filters,
