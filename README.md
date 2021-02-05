@@ -1,6 +1,8 @@
 # looker-dependency-graph
 Build a dependency graph of your Looker models, explores and views based on LookML files.
 
+It builds upon [`lkml`](https://github.com/joshtemple/lkml) parser and was inspired by [`gazetteer`](https://github.com/mathilda0902/gazetteer).
+
 
 ## Setup
 ### Your LookML files
