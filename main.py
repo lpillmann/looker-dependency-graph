@@ -19,7 +19,7 @@ def read_lookml(filepath):
 
 def get_nodes(model):
     lookml = read_lookml(model)
-    model_name = model.name
+    model_name = model.name.split(".")[0]
 
     nodes = dict()
     nodes[f"model.{model_name}"] = Node()
