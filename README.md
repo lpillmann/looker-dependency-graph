@@ -1,5 +1,5 @@
 # looker-dependency-graph
-Build a dependency graph based on your Looker `.model` files.
+Build a dependency graph of your Looker models, explores and views based on LookML files.
 
 ## Dependencies
 ```bash
@@ -8,14 +8,18 @@ poetry install
 ```
 
 ## Setup
-Add your model files into `input/models/`.
+Replace the contents of `input/models/` with your own `.model.lkml` files.
 
 ## Run
-```
+```bash
 poetry shell
 python main.py
 ```
 
-## Example output
-
+Outputs:
 ![example graph](./output/example_dependency_graph.gv.png)
+### Filtering the graph output
+Use `--filters` argument to only render edges of desired nodes. Example:
+```bash
+python main.py --filters 'explore.user_events_cube explore.another_explore'
+```
