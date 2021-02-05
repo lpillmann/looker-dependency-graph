@@ -11,6 +11,8 @@ from graphviz import Digraph
 
 INPUT_MODELS_PATH = "./input/models"
 MODEL_FILE_EXTENSION = "*.model.lkml"
+OUTPUT_FILE_PATH = "output/dependency_graph.gv"
+RENDER_FORMAT = "pdf"
 
 
 class Node(UserDict):
@@ -114,7 +116,7 @@ def build_graph(manifest: dict, filters: List = []) -> Digraph:
     Build directed graph of dependencies.
     Add edges by iterating over each parent/child combination in manifest child map.
     """
-    g = Digraph("G", format="pdf", node_attr={"color": "lightblue2", "style": "filled"})
+    g = Digraph("G", format=RENDER_FORMAT, node_attr={"color": "lightblue2", "style": "filled"})
     g.attr(rankdir="LR")
 
     pairs = []
@@ -155,7 +157,7 @@ def main(filters: str):
         filters=parsed_filters,
     )
 
-    filename = Path(f"output/dependency_graph.gv")
+    filename = Path(OUTPUT_FILE_PATH)
     render_graph(g, filename)
 
 
