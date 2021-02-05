@@ -70,7 +70,8 @@ def read_example_manifest():
 
 
 def build_graph(manifest):
-    g = Digraph("G", format="pdf")
+    g = Digraph("G", format="pdf", node_attr={'color': 'lightblue2', 'style': 'filled'})
+    g.attr(rankdir='LR')
 
     pairs = []
     for parent in manifest["child_map"].keys():
