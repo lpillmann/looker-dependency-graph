@@ -117,7 +117,7 @@ def build_graph(manifest: dict, filters: List = []) -> Digraph:
             pairs.append((parent, child))
 
     for pair in pairs:
-        if any(f in pair for f in filters):
+        if not filters or any(f in pair for f in filters):
             g.edge(*pair)
 
     return g
@@ -139,12 +139,16 @@ def main(filters: str):
         print("No LookML models found. Using example instead.")
         manifest = read_example_manifest()
 
+    parsed_filters = []
+    if filters:
+        parsed_filters = filters.split(" ")
+    
     g = build_graph(
         manifest,
-        filters=filters.split(" "),
+        filters=parsed_filters,
     )
 
-    filename = Path(f"output/dependency_graph|{filters.replace(' ', '+')}.gv")
+    filename = Path(f"output/dependency_graph.gv")
     render_graph(g, filename)
 
 
