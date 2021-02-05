@@ -1,13 +1,10 @@
-import json
 from collections import UserDict
 from pathlib import Path
-from typing import Final, List
+from typing import List
 
 import click
-from graphviz.backend import render
 import lkml
 from graphviz import Digraph
-
 
 INPUT_MODELS_PATH = "./input/models"
 MODEL_FILE_EXTENSION = "*.model.lkml"
@@ -21,6 +18,7 @@ class Node(UserDict):
 
 
 def read_lookml(path: Path) -> dict:
+    """Parse a LookML file"""
     with open(path) as f:
         lookml = lkml.load(f.read())
     return lookml
@@ -105,12 +103,6 @@ def build_manifest() -> dict:
     return manifest
 
 
-def read_example_manifest():
-    with open("example_manifest.json") as f:
-        manifest = json.loads(f.read())
-    return manifest
-
-
 def build_graph(manifest: dict, filters: List = []) -> Digraph:
     """
     Build directed graph of dependencies.
@@ -132,6 +124,7 @@ def build_graph(manifest: dict, filters: List = []) -> Digraph:
 
 
 def render_graph(g: Digraph, path: Path):
+    """Render a Graph saving output to a given path"""
     print(f"Rendering {path}")
     g.render(path, view=True)
 
