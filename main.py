@@ -1,8 +1,10 @@
 import json
 from collections import UserDict
 from pathlib import Path
+from typing import List
 
 import click
+from graphviz.backend import render
 import lkml
 from graphviz import Digraph
 
@@ -12,13 +14,27 @@ class Node(UserDict):
         self.data = dict(depends_on=[])
 
 
-def read_lookml(filepath):
-    with open(filepath) as f:
+def read_lookml(path: Path) -> dict:
+    with open(path) as f:
         lookml = lkml.load(f.read())
     return lookml
 
 
-def get_nodes(model):
+def build_nodes(model: Path) -> dict:
+    """
+    Build nodes dictionary from a LookML model.
+    Each node has a unique name and a list of node names it depends on.
+
+    Returns:
+        "nodes": {
+            "model.product": {
+                "depends_on": [
+                        "explore.user_events_cube"
+                ]
+            },
+            ...
+        }
+    """
     lookml = read_lookml(model)
     model_name = model.name.split(".")[0]
 
@@ -40,23 +56,40 @@ def get_nodes(model):
     return nodes
 
 
-def build_child_map(nodes):
+def build_child_map(nodes: dict) -> dict:
+    """
+    Build child map combining all `depends_on` specifications.
+    Each entry is a node with the full list of children.
+
+    Returns:
+        "child_map": {
+            "explore.user_events_cube": [
+                "view.user_events_cube",
+                "view.dummy_view"
+            ],
+            ...
+        }
+    """
     child_map = dict()
     for node_name, contents in nodes.items():
         child_map[node_name] = contents["depends_on"]
     return child_map
 
 
-def build_manifest():
+def build_manifest() -> dict:
+    """
+    Build manifest containing nodes and child map objects.
+    Expects LookML .model files to be in input/models folder.
+    """
     p = Path("./input/models")
     models = list(p.glob("**/*.model.lkml"))
 
     if not len(models) > 0:
         return None
 
-    manifest = dict(nodes={}, child_map={})
+    manifest = dict(nodes=dict(), child_map=dict())
     for model in models:
-        nodes = get_nodes(model)
+        nodes = build_nodes(model)
         manifest["nodes"] = {**manifest["nodes"], **nodes}
         child_map = build_child_map(nodes)
         manifest["child_map"] = {**manifest["child_map"], **child_map}
@@ -70,7 +103,11 @@ def read_example_manifest():
     return manifest
 
 
-def build_graph(manifest, filters=[]):
+def build_graph(manifest: dict, filters: List = []) -> Digraph:
+    """
+    Build directed graph of dependencies.
+    Add edges by iterating over each parent/child combination in manifest child map.
+    """
     g = Digraph("G", format="pdf", node_attr={"color": "lightblue2", "style": "filled"})
     g.attr(rankdir="LR")
 
@@ -86,12 +123,16 @@ def build_graph(manifest, filters=[]):
     return g
 
 
+def render_graph(g: Digraph, path: Path):
+    g.render(path, view=True)
+
+
 @click.command()
 @click.option(
     "--filters",
     help="Keep only edges connecting node passed. For multiple filters, pass a string with node names seperated by spaces",
 )
-def main(filters):
+def main(filters: str):
     manifest = build_manifest()
 
     if manifest is None:
@@ -102,7 +143,9 @@ def main(filters):
         manifest,
         filters=filters.split(" "),
     )
-    g.render(f"output/dependency_graph|{filters.replace(' ', '+')}.gv", view=True)
+
+    filename = Path(f"output/dependency_graph|{filters.replace(' ', '+')}.gv")
+    render_graph(g, filename)
 
 
 if __name__ == "__main__":
