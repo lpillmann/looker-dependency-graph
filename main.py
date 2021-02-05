@@ -2,6 +2,7 @@ import json
 from collections import UserDict
 from pathlib import Path
 
+import click
 import lkml
 from graphviz import Digraph
 
@@ -49,17 +50,17 @@ def build_child_map(nodes):
 def build_manifest():
     p = Path("./input/models")
     models = list(p.glob("**/*.model.lkml"))
-    
+
     if not len(models) > 0:
         return None
-    
+
     manifest = dict(nodes={}, child_map={})
     for model in models:
         nodes = get_nodes(model)
         manifest["nodes"] = {**manifest["nodes"], **nodes}
         child_map = build_child_map(nodes)
         manifest["child_map"] = {**manifest["child_map"], **child_map}
-    
+
     return manifest
 
 
@@ -69,9 +70,9 @@ def read_example_manifest():
     return manifest
 
 
-def build_graph(manifest):
-    g = Digraph("G", format="pdf", node_attr={'color': 'lightblue2', 'style': 'filled'})
-    g.attr(rankdir='LR')
+def build_graph(manifest, filters=[]):
+    g = Digraph("G", format="pdf", node_attr={"color": "lightblue2", "style": "filled"})
+    g.attr(rankdir="LR")
 
     pairs = []
     for parent in manifest["child_map"].keys():
@@ -79,20 +80,29 @@ def build_graph(manifest):
             pairs.append((parent, child))
 
     for pair in pairs:
-        g.edge(*pair)
+        if any(f in pair for f in filters):
+            g.edge(*pair)
 
     return g
 
 
-def main():
+@click.command()
+@click.option(
+    "--filters",
+    help="Keep only edges connecting node passed. For multiple filters, pass a string with node names seperated by spaces",
+)
+def main(filters):
     manifest = build_manifest()
 
     if manifest is None:
         print("No LookML models found. Using example instead.")
         manifest = read_example_manifest()
 
-    g = build_graph(manifest)
-    g.render("output/dependency_graph.gv", view=True)
+    g = build_graph(
+        manifest,
+        filters=filters.split(" "),
+    )
+    g.render(f"output/dependency_graph|{filters.replace(' ', '+')}.gv", view=True)
 
 
 if __name__ == "__main__":

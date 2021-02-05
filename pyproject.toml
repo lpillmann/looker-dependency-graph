@@ -8,6 +8,7 @@ authors = ["Lui Pillmann <lui.pillmann@gmail.com>"]
 python = "^3.8"
 graphviz = "^0.16"
 lkml = "^1.1.0"
+click = "^7.1.2"
 
 [tool.poetry.dev-dependencies]
 black = "^20.8b1"
