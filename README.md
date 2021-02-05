@@ -17,7 +17,7 @@ python main.py
 ```
 
 Outputs:
-![example graph](./output/example_dependency_graph.gv.png)
+![example graph](./example_dependency_graph.gv.png)
 ### Filtering the graph output
 Use `--filters` argument to only render edges of desired nodes. Example:
 ```bash
